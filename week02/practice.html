@@ -1,0 +1,105 @@
+<!Doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Javascript + jQuery + Ajax 연습하기</title>
+    <!-- JQuery를 import 합니다 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style type="text/css">
+        div.question-box {
+            margin: 10px 0 20px 0;
+        }
+
+        table {
+            border: 1px solid;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            padding: 10px;
+            border: 1px solid;
+        }
+        .urgent {
+            color: red;
+            font-weight: bold;
+          }
+    </style>
+
+    <script>
+        // 받아온 정보를 화면(테이블 안 열)에 보여줍니다.
+        function makeRow(bikeCnt, rackName, rackCnt) {
+            let tempHtml = '';
+            // 만약 남아있는 자전거가 5대 이하면 빨갛게(urgent 디자인 적용) 보여주는 코드
+            if (bikeCnt < 5) {
+                tempHtml = `<tr class="urgent">
+                                <td>${rackName}</td>
+                                <td>${rackCnt}</td>
+                                <td>${bikeCnt}</td>
+                              </tr>`;
+            } else {
+                // 5대 이하가 아니면
+                tempHtml = `<tr>\
+                                <td>${rackName}</td>
+                                <td>${rackCnt}</td>
+                                <td>${bikeCnt}</td>
+                              </tr>`;
+            }
+
+            // 화면 코드를 id=bike-info 에 추가하기
+            $('#bike-info').append(tempHtml);
+        }
+
+        // 따릉이 API를 사용해 정보를 화면에 보여줍니다(makeRow 함수).
+        function showBikeInfo() {
+            $('#bike-info').empty();
+            $.ajax({
+                type: "GET",
+                url: "http://openapi.seoul.go.kr:8088/6d4d776b466c656533356a4b4b5872/json/bikeList/1/99",
+                data: {},
+                success: function (response) {
+                    // 필요한 데이터 가져오기
+                    let rows = response["rentBikeStatus"]["row"];
+                    // 반복문 패턴에서 배웠었죠? 모든 열 안의 데이터에 각각 접근하기
+                    for (let i = 0; i < rows.length; i++) {
+                        // 거치대 정류장 이름, 정류장의 거치대 수, 남은 자전거 수
+                        let rackName = rows[i]['stationName'];
+                        let rackCnt = rows[i]['rackTotCnt'];
+                        let bikeCnt = rows[i]['parkingBikeTotCnt'];
+                        // 정보를 화면에 보여주는 함수
+                        makeRow(bikeCnt, rackName, rackCnt);
+                    }
+                }
+            })
+        }
+    </script>
+
+</head>
+
+<body>
+<h1>Javascript + jQuery + Ajax 연습하기</h1>
+
+<hr/>
+
+<div class="question-box">
+    <h2>서울시 OpenAPI(실시간 따릉이 현황)를 이용하기</h2>
+    <p>모든 거치대(stationName)와 거치대 수(rackTotCnt), 남은 따릉이 수(parkingBikeTotCnt)를 보여주세요</p>
+    <p>업데이트 버튼을 누를 때마다 데이터가 지웠다 새로 씌여져야 합니다.</p>
+    <button onclick="showBikeInfo()">업데이트</button>
+    <table>
+        <thead>
+        <tr>
+            <td>거치대 위치</td>
+            <td>거치대 수</td>
+            <td>현재 거치된 따릉이 수</td>
+        </tr>
+        </thead>
+        <tbody id="bike-info">
+        </tbody>
+    </table>
+</div>
+</body>
+
+</html>

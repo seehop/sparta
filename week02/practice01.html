@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <!-- Webpage Title -->
+        <title>나홀로 쇼핑몰 | 마법 지팡이</title>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
+
+        <!-- JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+
+        <!-- 구글폰트 -->
+        <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+        <script type="text/javascript">
+            function order() {
+                let name = $('#order-name').val();
+                let count = $('#order-count').val();
+                let address = $('#order-address').val();
+                let phone = $('#order-phone').val();
+
+                if (name == '') {
+                    alert('이름을 입력해주세요');
+                    $('#order_name').focus();
+                    return;
+                } else if (count == '') {
+                    alert('수량을 입력해주세요');
+                    $('#order_count').focus();
+                    return;
+                } else if (address == '') {
+                    alert('주소를 입력해주세요');
+                    $('#order_address').focus();
+                    return;
+                } else if (phone == '') {
+                    alert('휴대폰번호를 입력해주세요');
+                    $('#order_phone').focus();
+                    return;
+                }
+            }
+
+            $(document).ready(function () {
+                showSpell();
+                showOrderList();
+            });
+
+            function showOrderList() {
+                $('#orders-box').empty();
+                $.ajax({
+                    type: "GET",
+                    url: "http://spartacodingclub.shop/order",
+                    data: {},
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            let orders = response['orders'];
+                            console.log(orders);
+                            for (let i = 0; i < orders.length; i++) {
+                                makeOrderRow(orders[i]['name'], orders[i]['count'], orders[i]['address'], orders[i]['phone'])
+                            }
+                        } else {
+                            alert('주문 받아오지 못했습니다');
+                        }
+                    }
+                })
+            }
+
+            function makeOrderRow(name, count, address, phone) {
+                let tempHtml = `<tr>\
+                                <td>${name}</td>
+                                <td>${count}</td>
+                                <td>${address}</td>
+                                <td>${phone}</td>
+                              </tr>`;
+                $('#orders-box').append(tempHtml);
+            }
+
+            function showSpell() {
+                // 주문 목록 중, 임의의 주문 하나를 출력하기 위한 0 ~ 150(주문 리스트의 총 배열 길이는 151개) 랜덤값 만들기.
+                let randomIdx = getRandomInt(150);
+
+                $.ajax({
+                    type: "GET",
+                    url: 'https://www.potterapi.com/v1/spells?key=$2a$10$LiNkiQtS86DQ8.NxC9G95.NN3.KkhNa917y/RZ6EjDILkjBaAJSLS',
+                    data: {},
+                    success: function (response) {
+                        $('#spell').text(response[randomIdx]['spell']);
+                    }
+                })
+            }
+
+            // 0 ~ 최대(max) 사이 임의 정수를 반환해주는 함수
+            function getRandomInt(max) {
+                return Math.floor(Math.random() * Math.floor(max));
+            }
+
+        </script>
+
+        <style type="text/css">
+            * {
+                font-family: 'Stylish', sans-serif;
+            }
+
+            .wrap {
+                width: 500px;
+                margin: auto;
+            }
+
+            .img {
+                background-image: url('https://c0.wallpaperflare.com/preview/102/951/642/harry-potter-magic-wands-olivanders-universal-studios.jpg');
+                background-size: cover;
+                background-position: center;
+                width: 500px;
+                height: 300px;
+            }
+
+            .info {
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+
+            h1, h5 {
+                display: inline;
+            }
+
+            .order {
+                text-align: center;
+            }
+
+            .orders {
+                margin-top: 100px;
+            }
+
+            .spell-info {
+                color: blue;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrap">
+            <div class="img"></div>
+            <div class="info">
+                <h1>마법 지팡이를 팝니다</h1>
+                <h5>가격: 3,000 갈레온 / 개</h5>
+                <p>이 지팡이는 마법사들에겐 특별한 힘을 발휘할 수 있게 해줘요. 지팡이를 들고 주문을 외우면 짜자잔!</p>
+                <div class="spell-info">실행할 수 있는 주문은? <span id="spell"></span></div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">주문자 이름</span>
+                    </div>
+                    <input type="text" class="form-control" id="order-name">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="order-count">수량</label>
+                    </div>
+                    <select class="custom-select" id="order-count">
+                        <option selected value=""> -- 수량을 선택하세요 --</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">주소</span>
+                    </div>
+                    <input type="text" class="form-control" id="order-address">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">전화번호</span>
+                    </div>
+                    <input type="text" class="form-control" id="order-phone">
+                </div>
+                <div class="order">
+                    <button onclick="order()" type="button" class="btn btn-primary">주문하기</button>
+                </div>
+            </div>
+            <div class="orders">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">이름</th>
+                        <th scope="col">수량</th>
+                        <th scope="col">주소</th>
+                        <th scope="col">전화번호</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orders-box">
+                    <tr>
+                        <td>박르탄</td>
+                        <td>3</td>
+                        <td>스파르타국 코딩시 프론트구</td>
+                        <td>010-1234-5678</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
