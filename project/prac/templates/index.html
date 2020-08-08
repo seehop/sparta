@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <title>Title</title>
+         $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: "/greeting?name=김개똥&age=30",
+                data: {},
+                success: function (response) {
+                    console.log(response)
+                }
+            })
+            $.ajax({
+                type: "POST",
+                url: "/greeting",
+                data: {name: "김개똥", age: "30"},
+                success: function (response) {
+                    console.log(response)
+                }
+            })
+        })
+    </head>
+    <body>
+        <h1>서버를 만들었다!</h1>
+        <img src="{{ url_for('static', filename='rome.jpg') }}"/>
+
+
+    </body>
+</html>
