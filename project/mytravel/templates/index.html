@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>나홀로여행</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <style>
+        * {
+            font-family: 'Poor Story', cursive;
+        }
+
+        .posting-box {
+            max-width: 500px;
+            width: 90%;
+            margin: 20px auto 20px auto;
+
+            padding: 20px;
+            background-color: whitesmoke;
+        }
+
+        .mycity > h3 {
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .mycity > h3 > span {
+            font-weight: normal;
+            font-size: 1.2rem;
+        }
+
+        .mycity > p {
+            font-size: 1.2rem;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            show();
+        });
+
+        function show() {
+            $('#city-box').empty();
+            $.ajax({
+                type: "GET",
+                url: "/show",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let mycities = response['mycities'];
+                        for (let i = 0; i < mycities.length; i++) {
+                            let city = mycities[i]['city']
+                            let image = mycities[i]['image']
+                            let when = mycities[i]['when']
+                            let memo = mycities[i]['memo']
+
+                            let temp_html = `<div class='column is-4'">
+                                                <div class="card">
+                                                    <div class="card-image">
+                                                        <figure class="image is-4by3">
+                                                            <img src="${image}"
+                                                                 alt="Placeholder image">
+                                                        </figure>
+                                                    </div>
+                                                    <div class="card-content mycity">
+                                                        <h3>${city} <span>(예정: ${when})</span></h3>
+                                                        <p>${memo}</p>
+                                                    </div>
+                                                </div>
+                                            </div>`
+                            $('#city-box').append(temp_html)
+                        }
+                    }
+                }
+            })
+        }
+
+        function save() {
+            let city = $('#input-city').val();
+            let image = $('#input-image').val();
+            let when = $('#input-when').val();
+            let memo = $('#input-memo').val();
+
+            $.ajax({
+                type: "POST",
+                url: "/save",
+                data: {city_give: city, image_give: image, when_give: when, memo_give: memo},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert(response['msg'])
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<section class="hero is-danger">
+    <div class="hero-body has-text-centered">
+        <div class="container">
+            <h1 class="title">
+                언젠가는 가고 말거야!
+            </h1>
+            <h2 class="subtitle">
+                내가 가고 싶은 여행지 모음
+            </h2>
+        </div>
+    </div>
+</section>
+<div class="posting-box">
+    <div class="field">
+        <label class="label">가고 싶은 도시</label>
+        <div class="control">
+            <input id="input-city" class="input" type="text" placeholder="예) 일본 도쿄">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">이미지 주소</label>
+        <div class="control">
+            <input id="input-image" class="input" type="text" placeholder="이미지 url을 복사해서 넣기">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">언제갈까?</label>
+        <div class="control">
+            <input id="input-when" class="input" type="text" placeholder="예) 2021.06">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">가고 싶은 이유</label>
+        <div class="control">
+            <textarea id="input-memo" class="textarea" placeholder="도쿄의 벚꽃을 보고 싶다. 마지막으로 간 게 언제였더라."></textarea>
+        </div>
+    </div>
+    <div class="field is-grouped">
+        <div class="control">
+            <button onclick="save()" class="is-danger button is-link">기록해두기</button>
+        </div>
+    </div>
+</div>
+<div class='columns is-multiline' id="city-box">
+    <div class='column is-4'>
+        <div class="card">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                    <img src="https://d20aeo683mqd6t.cloudfront.net/ko/articles/title_images/000/038/800/medium/pixta_54119075_M.jpg?2019"
+                         alt="Placeholder image">
+                </figure>
+            </div>
+            <div class="card-content mycity">
+                <h3>도쿄 <span>(예정: 2020.06)</span></h3>
+                <p>도쿄의 벚꽃을 보고 싶다. 마지막으로 간 게 언제였더라.</p>
+            </div>
+        </div>
+    </div>
+    <div class='column is-4'>
+        <div class="card">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                    <img src="https://d20aeo683mqd6t.cloudfront.net/ko/articles/title_images/000/038/800/medium/pixta_54119075_M.jpg?2019"
+                         alt="Placeholder image">
+                </figure>
+            </div>
+            <div class="card-content mycity">
+                <h3>도쿄 <span>(예정: 2020.06)</span></h3>
+                <p>도쿄의 벚꽃을 보고 싶다. 마지막으로 간 게 언제였더라.</p>
+            </div>
+        </div>
+    </div>
+    <div class='column is-4'>
+        <div class="card">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                    <img src="https://d20aeo683mqd6t.cloudfront.net/ko/articles/title_images/000/038/800/medium/pixta_54119075_M.jpg?2019"
+                         alt="Placeholder image">
+                </figure>
+            </div>
+            <div class="card-content mycity">
+                <h3>도쿄 <span>(예정: 2020.06)</span></h3>
+                <p>도쿄의 벚꽃을 보고 싶다. 마지막으로 간 게 언제였더라.</p>
+            </div>
+        </div>
+    </div>
+    <div class='column is-4'>
+        <div class="card">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                    <img src="https://d20aeo683mqd6t.cloudfront.net/ko/articles/title_images/000/038/800/medium/pixta_54119075_M.jpg?2019"
+                         alt="Placeholder image">
+                </figure>
+            </div>
+            <div class="card-content mycity">
+                <h3>도쿄 <span>(예정: 2020.06)</span></h3>
+                <p>도쿄의 벚꽃을 보고 싶다. 마지막으로 간 게 언제였더라.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
