@@ -12,7 +12,7 @@ def init_db():
     options.add_argument("disable-gpu")
     options.add_argument(
         "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
-    path = "C:/Users/sohee/Desktop/sparta/develop/chromedriver"
+    path = "/Users/lopun/Downloads/chromedriver"
     driver = webdriver.Chrome(path, options=options)
     f = open('firm_stock.csv', 'r', encoding='utf-8')
     print("파일 오픈")

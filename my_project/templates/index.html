@@ -1,4 +1,3 @@
-
 <!Doctype html>
 <html lang="ko">
 
@@ -39,7 +38,7 @@
         }
 
         .wrap {
-            margin: auto;
+            padding: 0px 30px;
         }
 
         .comment {
@@ -54,91 +53,103 @@
             border: black solid;
             border-radius: 5px;
         }
+
+        .stock-description {
+            margin-bottom: 10px;
+        }
     </style>
     <script>
-        $(document).ready(function () {
-            $("#stock-box").html("");
-            recommendStocks();
-        });
+      $(document).ready(function () {
+        $("#stock-box").html("");
+        recommendStocks();
+      });
 
-        function openClose() {
-            // id 값 stock-box의 display 값이 block 이면(= 눈에 보이면)
-            if ($("#stock-box").css("display") == "block") {
-                // post-box를 가리고
-                $("#stock-box").hide();
-                // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
-                $("#btn-stock-box").text("추천 주식 열기");
+      function openClose() {
+        // id 값 stock-box의 display 값이 block 이면(= 눈에 보이면)
+        if ($("#stock-box").css("display") == "block") {
+          // post-box를 가리고
+          $("#stock-box").hide();
+          // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
+          $("#btn-stock-box").text("추천 주식 열기");
+        } else {
+          // 아니면(눈에 보이지 않으면) post-box를 펴라
+          $("#stock-box").show();
+          // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
+          $("#btn-stock-box").text("추천 주식 닫기");
+        }
+      }
+
+      function searchStocks() {
+        let name = $("#search_input").val();
+
+        $.ajax({
+          type: "GET",
+          url: `/api/search/${name}`,
+          data: {},
+          success: function (response) { // 성공하면
+            $("#search-stock-box").empty()
+            if (response["result"] == "success") {
+              let stocks = response["stocks"];
+              console.log(stocks);
+              for (let i = 0; i < stocks.length; i++) {
+                makeCard(stocks[i]["name"], stocks[i]["prc"], stocks[i]["eper"], stocks[i]["eps"], stocks[i]["pbr"], stocks[i]["img_src"], "search-stock-box")
+              }
             } else {
-                // 아니면(눈에 보이지 않으면) post-box를 펴라
-                $("#stock-box").show();
-                // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
-                $("#btn-stock-box").text("추천 주식 닫기");
+              alert("서버 오류!")
             }
-        }
+          }
+        })
+      }
 
-        function searchStocks() {
-            let name = $("#search_input").val();
+      function recommendStocks() {
+        $.ajax({
+          type: "GET",
+          url: "/api/list",
+          data: {},
+          success: function (response) {
+            let stocks = response["stocks"];
+            console.log(stocks);
+            for (let i = 0; i < stocks.length; i++) {
+              makeCard(stocks[i]["name"], stocks[i]["prc"], stocks[i]["eper"], stocks[i]["eps"], stocks[i]["pbr"], stocks[i]["img_src"], "recommended-stock-box")
+            }
+          }
+        })
+      }
 
-            $.ajax({
-                type: "GET",
-                url: `/api/search/${name}`,
-                data: {},
-                success: function (response) { // 성공하면
-                    if (response["result"] == "success") {
-                        showStocks()
-
-                    } else {
-                        alert("서버 오류!")
-                    }
-                }
-            })
-        }
-
-        function recommendStocks() {
-            $.ajax({
-                type: "GET",
-                url: "/api/list",
-                data: {},
-                success: function (response) {
-                    let stocks = response["stocks"];
-                    console.log(stocks);
-                    for (let i = 0; i < stocks.length; i++) {
-                        makeCard(stocks[i]["name"], stocks[i]["prc"], stocks[i]["eper"], stocks[i]["eps"], stocks[i]["pbr"], stocks[i]["img_src"], "recommended-stock-box")
-                    }
-                }
-            })
-        }
-
-        function makeCard(name, prc, eper, eps, pbr, img_src, target) {
-            let tempHtml = `<div class="card">
+      function makeCard(name, prc, eper, eps, pbr, img_src, target) {
+        let tempHtml = `<div class="card">
                     <img class="card-img-top"
-                         src="${image}"
+                         src="${img_src}"
                          alt="Card image cap">
                     <div class="card-body">
-                        <a href="${url}" target="_blank" class="card-title">${title}</a>
-                        <p class="card-text">${desc}</p>
-                        <p class="card-text comment">${comment}</p>
-                        <button onclick="saveCard('${code}')">저장하기</button>
+                        <a href="#" target="_blank" class="card-title">${name}</a>
+                        <p class="card-text">
+                        <div class="stock-description">- prc : ${prc}</div>
+                        <div class="stock-description">- eper : ${eper}</div>
+                        <div class="stock-description">- eps : ${eps}</div>
+                        <div class="stock-description">- pbr : ${pbr}</div>
+                        </p>
+                        <button>내 주식으로 저장</button>
                     </div>
                 </div>`;
-            $(`#${target}`).append(tempHtml);
-        }
+        $(`#${target}`).append(tempHtml);
+      }
 
-        function saveCard(code) {
-            const username = $("#user-name").val()
-            if (username && username != "") {
-                $.ajax({
-                    method: 'POST',
-                    url: '/mystocks',
-                    data: {username: username, code: code},
-                    success: function (response) {
-                        // 성공시
-                    }
-                })
-            } else {
-                alert('일므을 입력해주세요!')
+      function saveCard(code) {
+        const username = $("#user-name").val()
+        if (username && username != "") {
+          $.ajax({
+            method: 'POST',
+            url: '/mystocks',
+            data: {username: username, code: code},
+            success: function (response) {
+              // 성공시
             }
+          })
+        } else {
+          alert('일므을 입력해주세요!')
         }
+      }
     </script>
 
 </head>
@@ -164,11 +175,6 @@
     <div class="jumbotron">
         <h1 class="display-4">주식 다모아! </h1>
         <p class="lead">추천 주식을 확인하고 원하는 주식을 검색할 수 있는 공간이에요.</p>
-        <hr class="my-4">
-        <p class="lead">
-            <button onclick="openClose()" id="btn-post-box" type="button" class="btn btn-primary">추천 주식 열기
-            </button>
-        </p>
     </div>
     <div id="post-box" class="form-post" style="display:none">
         <div>

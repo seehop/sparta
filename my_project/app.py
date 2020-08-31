@@ -23,11 +23,12 @@ def home():
 def recommend_stocks():
     ###################### 1. db에서 stock 목록 전체를 검색합니다. ID는 제외하고 eper이 iper보다 낮고 pbr가 1.5보다 낮은 목록에서 3개를 랜덤 추출합니다.
     recommended_stocks = list(db.stocks.find({"$where": "this.eper < this.iper && this.pbr >= 1.5"}, {'_id': False}))
+    random.shuffle(recommended_stocks)
     print(recommended_stocks)
     ###################################################################랜덤추출
-    random_stocks=
+    random_stocks = recommended_stocks[:3]
     # 2. 성공하면 success 메시지와 함께 stars_list 목록을 클라이언트에 전달합니다.
-    return jsonify({'result': 'success', 'msg': 'random_stocks'})
+    return jsonify({'result': 'success', 'stocks': random_stocks})
 
 
 #######고객이 찾은 검색어를 list파일에서 찾아 해당 기업의 주식 정보를 가져오기
@@ -35,16 +36,16 @@ def recommend_stocks():
 def search_stocks(name):
     found_stocks = list(db.stocks.find({'name': {'$regex': ".*" + name + ".*"}}, {'_id': False}))
     # 4. 성공하면 success 메시지와 함께 정보 목록을 클라이언트에 전달합니다.
-    return jsonify({'result': 'success', 'msg': found_stocks})
+    return jsonify({'result': 'success', 'stocks': found_stocks})
 
 #######고객이 저장하는 주식 정보 따로 모으기
 
 # @app.route('/api/mystocks', methods=['POST'])
 # def save_mystocks():
     # # 1. 유저의 id를 받습니다.
-    id_receive = request.form['id_give']
+#     id_receive = request.form['id_give']
     # # 2. 유저가 저장한 기업의 code를 받습니다.
-    stock_receive=request.form['stock_give']
+#     stock_receive=request.form['stock_give']
     # # 3. 유저 id에 해당하는 db에 code를 추가합니다.
 
     # # 4. 성공하면 success 메시지를 반환합니다.
