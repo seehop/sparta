@@ -30,32 +30,49 @@
 
         .log-in {
             float: right;
-            margin: 30px;
+            padding: 20px 40px 20px 20px;
         }
 
-        .col-auto3 {
-            color: cadetblue;
+        .stock-title{
+            font-size: 20px;
         }
 
         .wrap {
-            padding: 0px 30px;
+            padding: 80px 30px 20px 30px;
         }
 
-        .comment {
-            color: blue;
-            font-weight: bold;
+        .recommend {
+            padding: 10px 10px 10px 30px;
         }
 
-        #post-box {
-            width: 500px;
-            margin: 20px auto;
-            padding: 50px;
-            border: black solid;
-            border-radius: 5px;
+        .card {
+            padding: auto;
+            margin: auto;
+        }
+
+        .card-deck-wrapper{
+            padding: auto;
+            outline-color: lightskyblue;
+        }
+
+        .card-deck{
+            padding: 15px;
+        }
+
+        .search {
+            padding: 10px 10px 10px 30px;
         }
 
         .stock-description {
             margin-bottom: 10px;
+        }
+
+        .save-button {
+            padding: auto;
+        }
+
+        .input-group {
+            width: 600px;
         }
     </style>
     <script>
@@ -66,14 +83,14 @@
 
       function openClose() {
         // id 값 stock-box의 display 값이 block 이면(= 눈에 보이면)
-        if ($("#stock-box").css("display") == "block") {
+        if ($("#recommended-stock-box").css("display") == "block") {
           // post-box를 가리고
-          $("#stock-box").hide();
+          $("#recommended-stock-box").hide();
           // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
           $("#btn-stock-box").text("추천 주식 열기");
         } else {
           // 아니면(눈에 보이지 않으면) post-box를 펴라
-          $("#stock-box").show();
+          $("#recommended-stock-box").show();
           // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
           $("#btn-stock-box").text("추천 주식 닫기");
         }
@@ -92,7 +109,7 @@
               let stocks = response["stocks"];
               console.log(stocks);
               for (let i = 0; i < stocks.length; i++) {
-                makeCard(stocks[i]["name"], stocks[i]["prc"], stocks[i]["eper"], stocks[i]["eps"], stocks[i]["pbr"], stocks[i]["img_src"], "search-stock-box")
+                makeCard(stocks[i]["name"], stocks[i]["prc"], stocks[i]["eper"], stocks[i]["iper"], stocks[i]["eps"], stocks[i]["pbr"], stocks[i]["img_src"], "search-stock-box")
               }
             } else {
               alert("서버 오류!")
@@ -110,26 +127,26 @@
             let stocks = response["stocks"];
             console.log(stocks);
             for (let i = 0; i < stocks.length; i++) {
-              makeCard(stocks[i]["name"], stocks[i]["prc"], stocks[i]["eper"], stocks[i]["eps"], stocks[i]["pbr"], stocks[i]["img_src"], "recommended-stock-box")
+              makeCard(stocks[i]["name"], stocks[i]["prc"], stocks[i]["eper"], stocks[i]["iper"], stocks[i]["eps"], stocks[i]["pbr"], stocks[i]["img_src"], "recommendation")
             }
           }
         })
       }
 
-      function makeCard(name, prc, eper, eps, pbr, img_src, target) {
+      function makeCard(name, prc, eper, iper, eps, pbr, img_src, target) {
         let tempHtml = `<div class="card">
+                    <p class="stock-title" style="text-align:center;">${name}</p>
                     <img class="card-img-top"
                          src="${img_src}"
                          alt="Card image cap">
                     <div class="card-body">
-                        <a href="#" target="_blank" class="card-title">${name}</a>
-                        <p class="card-text">
-                        <div class="stock-description">- prc : ${prc}</div>
-                        <div class="stock-description">- eper : ${eper}</div>
-                        <div class="stock-description">- eps : ${eps}</div>
-                        <div class="stock-description">- pbr : ${pbr}</div>
+                        <p class="stock-text">
+                        <div class="stock-description">- 가격 : ${prc}원</div>
+                        <div class="stock-description">- 추청PER : ${eper} (산업평균PER : ${iper})</div>
+                        <div class="stock-description">- EPS : ${eps}</div>
+                        <div class="stock-description">- PBR : ${pbr}</div>
                         </p>
-                        <button>내 주식으로 저장</button>
+                        <a href="#" type="button" class="btn btn-outline-secondary" style="float: right; margin: auto">내 주식으로 저장</a>
                     </div>
                 </div>`;
         $(`#${target}`).append(tempHtml);
@@ -155,52 +172,60 @@
 </head>
 
 <body>
+
+<div class="log-in">
+    <form>
+        <div class="form-row align-items-center">
+            <div class="col-auto">
+                <label class="sr-only" for="inlineFormInput">Name</label>
+                <input type="text" class="form-control mb-2" id="inlineFormInput" placeholder="이름을 입력해주세요.">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary mb-2">로그인</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary mb-2">내 주식 보러가기</button>
+            </div>
+        </div>
+    </form>
+</div>
+
 <div class="wrap">
-    <div class="log-in">
-        <form>
-            <div class="form-row align-items-center">
-                <div class="col-auto">
-                    <label class="sr-only" for="inlineFormInput">Name</label>
-                    <input type="text" class="form-control mb-2" id="inlineFormInput" placeholder="이름을 입력해주세요.">
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary mb-2">로그인</button>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary mb-2">내 주식 보러가기</button>
-                </div>
-            </div>
-        </form>
-    </div>
+
     <div class="jumbotron">
-        <h1 class="display-4">주식 다모아! </h1>
-        <p class="lead">추천 주식을 확인하고 원하는 주식을 검색할 수 있는 공간이에요.</p>
+        <h1 class="display-4"> 💰 주식 다모아! </h1>
+        <p class="lead text-secondary"> 추천 주식을 확인하고 원하는 주식을 검색할 수 있는 공간이에요.</p>
     </div>
-    <div id="post-box" class="form-post" style="display:none">
-        <div>
-            <div class="form-group">
-                <label for="post-url">아티클 URL</label>
-                <input id="post-url" class="form-control" placeholder="">
+
+    <div class="recommend">
+        <h2>> 추천 주식 💌</h2>
+        <p class="text-secondary"> 추정 PER이 산업 평균 PER보다 낮고 PBR이 1보다 낮은 주식들을 추천해드려요!</p>
+        <p class="lead">
+            <button onclick="openClose()" id="btn-stock-box" type="button" class="btn btn-secondary">추천 주식 열기
+            </button>
+        </p>
+
+        <div id="recommended-stock-box" class="card-deck-wrapper"  style="display:none">
+            <div class="card">
+                <div id="recommendation" class="card-deck "></div>
             </div>
-            <div class="form-group">
-                <label for="post-comment">간단 코멘트</label>
-                <textarea id="post-comment" class="form-control" rows="2"></textarea>
-            </div>
-            <button type="button" class="btn btn-primary" onclick="postArticle()">기사저장</button>
         </div>
     </div>
-    <h2>추천 주식</h2>
-    <div id="recommended-stock-box" class="card-columns"></div>
-    <h2>주식 검색</h2>
-    <div class="input-group mb-3">
-        <input id="search_input" type="text" class="form-control" placeholder="검색할 주식을 입력하세요"
-               aria-label="Recipient's username"
-               aria-describedby="basic-addon2">
-        <div class="input-group-append">
-            <button onclick="searchStocks()" class="btn btn-primary">검색</button>
+
+    <hr class="my-4">
+
+    <div class="search">
+        <h2>> 주식 검색 💡</h2>
+        <div class="input-group mb-3">
+            <input id="search_input" type="text" class="form-control" placeholder="검색할 주식을 입력하세요"
+                   aria-label="Recipient's username"
+                   aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <button onclick="searchStocks()" class="btn btn-secondary">검색</button>
+            </div>
         </div>
+        <div id="search-stock-box" class="card-columns"></div>
     </div>
-    <div id="search-stock-box" class="card-columns"></div>
 </div>
 </body>
 

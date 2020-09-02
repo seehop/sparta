@@ -22,7 +22,7 @@ def home():
 @app.route('/api/list', methods=['GET'])
 def recommend_stocks():
     ###################### 1. db에서 stock 목록 전체를 검색합니다. ID는 제외하고 eper이 iper보다 낮고 pbr가 1.5보다 낮은 목록에서 3개를 랜덤 추출합니다.
-    recommended_stocks = list(db.stocks.find({"$where": "this.eper < this.iper && this.pbr >= 1.5"}, {'_id': False}))
+    recommended_stocks = list(db.stocks.find({"$where": "this.eper < this.iper && this.pbr <= 1"}, {'_id': False}))
     random.shuffle(recommended_stocks)
     print(recommended_stocks)
     ###################################################################랜덤추출
