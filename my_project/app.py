@@ -40,27 +40,42 @@ def search_stocks(name):
     return jsonify({'result': 'success', 'stocks': found_stocks})
 
 #######고객이 저장하는 주식 정보 따로 모으기
+@app.route("/api/stocks_by_name/<username>", methods=["POST"])
+def stocks_by_name_post(username):
+    code = request.args.get('code')
+    found_username_and_stocks = db.username_and_stocks.find_one({'username': username}, {'_id': False})
+    if found_username_and_stocks is None:
+        db.username_and_stocks.insert_one({'username': username, 'stock_codes': [code]})
+    else:
+        new_stock_codes = list(found_username_and_stocks['stock_codes'])
+        new_stock_codes.append(code)
+        db.username_and_stocks.update_one(
+            {'username': username},
+            {'$set': {'stock_codes': new_stock_codes}}
+        )
+    return jsonify({'result': 'success'})
 
-# @app.route('/api/mystocks', methods=['POST'])
-# def save_mystocks():
-    # # 1. 유저의 id를 받습니다.
-#     id_receive = request.form['id_give']
-    # # 2. 유저가 저장한 기업의 code를 받습니다.
-#     stock_receive=request.form['stock_give']
-    # # 3. 유저 id에 해당하는 db에 code를 추가합니다.
 
-    # # 4. 성공하면 success 메시지를 반환합니다.
+#######고객이 저장한 주식 정보 따로 보여주기
+@app.route("/api/stocks_by_name/<username>", methods=["GET"])
+def stocks_by_name_get(username):
+    # { "username": "lopun", "stock_codes": ["265520", ...] }
+    # username_and_stocks 테이블에서 username에 해당하는 값을 찾는다
+    found_username_and_stocks = db.username_and_stocks.find_one({'username': username}, {'_id': False})
+    print(found_username_and_stocks)
+    # username에 해당하는 값이 없으면 fail
+    if found_username_and_stocks is None:
+        return jsonify({"result": "failed"})
+    # username에 해당하는 값이 있으면
+    else:
+        # stock_codes들로
+        stock_codes = list(found_username_and_stocks["stock_codes"])
+        print(stock_codes)
+        # 진짜 stocks를 찾는다. 이 때 $in이라는 문법을 사용함
+        stocks = list(db.stocks.find({'code': {'$in': stock_codes}}, {'_id': False}))
+        # 클라이언트에게 모든 stock들을 내려주고 마무리
+        return jsonify({"result": "success", "stocks": stocks})
 
-
-#######마이페이지를 통해 고객이 저장하는 주식 정보 따로 보여주기
-# @ app.route('/api/mystocks', methods=['GET'])
-
-# 1. 유저의 id를 받습니다.
-    if_receive = request.form['id_give']
-
-# 2. 유저가 저장한 기업의 정보들을 보냅니다.
-
-# 3. 성공하면 success 메시지를 반환합니다.
 
 #######DB에 있는 정보가 하루 이상 지난 거면 init_db 실행
 def refresh_stock_info_job():

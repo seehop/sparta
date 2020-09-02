@@ -146,7 +146,7 @@
                         <div class="stock-description">- EPS : ${eps}</div>
                         <div class="stock-description">- PBR : ${pbr}</div>
                         </p>
-                        <a href="#" type="button" class="btn btn-outline-secondary" style="float: right; margin: auto">내 주식으로 저장</a>
+                        <button type="button" class="save-button btn btn-outline-secondary" style="float: right; margin: auto">내 주식으로 저장</button>
                     </div>
                 </div>`;
         $(`#${target}`).append(tempHtml);
@@ -224,6 +224,11 @@
                 <button onclick="searchStocks()" class="btn btn-secondary">검색</button>
             </div>
         </div>
+        <!--<div id="search-stock-box" class="card-deck-wrapper">
+            <div class="card">
+                <div id="findings" class="card-deck "></div>
+            </div>
+        </div>-->
         <div id="search-stock-box" class="card-columns"></div>
     </div>
 </div>
