@@ -35,6 +35,7 @@ def recommend_stocks():
 @app.route('/api/search/<name>', methods=['GET'])
 def search_stocks(name):
     found_stocks = list(db.stocks.find({'name': {'$regex': ".*" + name + ".*"}}, {'_id': False}))
+    print(name,found_stocks)
     # 4. 성공하면 success 메시지와 함께 정보 목록을 클라이언트에 전달합니다.
     return jsonify({'result': 'success', 'stocks': found_stocks})
 
