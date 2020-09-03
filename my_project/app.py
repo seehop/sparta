@@ -5,6 +5,7 @@ from datetime import datetime
 import init_db
 import random
 import schedule
+import re
 
 app = Flask(__name__)
 
@@ -34,42 +35,56 @@ def recommend_stocks():
 #######고객이 찾은 검색어를 list파일에서 찾아 해당 기업의 주식 정보를 가져오기
 @app.route('/api/search/<name>', methods=['GET'])
 def search_stocks(name):
-    found_stocks = list(db.stocks.find({'name': {'$regex': ".*" + name + ".*"}}, {'_id': False}))
+    #found_stocks = list(db.stocks.find({'name': {'$regex': ".*" + name + ".*"}}, {'_id': False}))
+    rgx = re.compile('.*' + name + '.*', re.IGNORECASE)  # compile the regex
+    found_stocks = list(db.stocks.find({'name': rgx}, {'_id': False}))
     print(name,found_stocks)
     # 4. 성공하면 success 메시지와 함께 정보 목록을 클라이언트에 전달합니다.
     return jsonify({'result': 'success', 'stocks': found_stocks})
 
+## 2번째 HTML 역할을 하는 부분
+@app.route('/mystocks/<ID>')
+def mystocks(ID):
+    return render_template('mystocks.html', ID=ID)
+
 #######고객이 저장하는 주식 정보 따로 모으기
-@app.route("/api/stocks_by_name/<username>", methods=["POST"])
-def stocks_by_name_post(username):
+@app.route("/api/mystocks/<username>", methods=["POST"])
+def mystocks_post(username):
     code = request.args.get('code')
-    found_username_and_stocks = db.username_and_stocks.find_one({'username': username}, {'_id': False})
+    found_username_and_stocks = db.saved_stocks.find_one({'username': username}, {'code': code},{'_id': False})
+    found_username = db.saved_stocks.find_ond({'username':username}, {'_id':False})
+
     if found_username_and_stocks is None:
-        db.username_and_stocks.insert_one({'username': username, 'stock_codes': [code]})
+        if found_username is None:
+            db.saved_stocks.insert_one({'username': username, 'stock_codes': code})
+            return jsonify({'result': 'success'})
+        else:
+            new_stock_codes = list(found_username['stock_codes'])
+            new_stock_codes.append(code)
+            db.saved_stocks.update_one(
+                {'username': username},
+                {'$set': {'stock_codes': new_stock_codes}}
+            )
+            return jsonify({'result': 'success'})
     else:
-        new_stock_codes = list(found_username_and_stocks['stock_codes'])
-        new_stock_codes.append(code)
-        db.username_and_stocks.update_one(
-            {'username': username},
-            {'$set': {'stock_codes': new_stock_codes}}
-        )
-    return jsonify({'result': 'success'})
+        return jsonify({'result':'overlap'})
+
 
 
 #######고객이 저장한 주식 정보 따로 보여주기
-@app.route("/api/stocks_by_name/<username>", methods=["GET"])
-def stocks_by_name_get(username):
+@app.route("/api/mystocks/<username>", methods=["GET"])
+def mystocks_get(username):
     # { "username": "lopun", "stock_codes": ["265520", ...] }
     # username_and_stocks 테이블에서 username에 해당하는 값을 찾는다
-    found_username_and_stocks = db.username_and_stocks.find_one({'username': username}, {'_id': False})
-    print(found_username_and_stocks)
+    found_username = db.saved_stocks.find_one({'username': username}, {'_id': False})
+    print(found_username)
     # username에 해당하는 값이 없으면 fail
-    if found_username_and_stocks is None:
+    if found_username is None:
         return jsonify({"result": "failed"})
     # username에 해당하는 값이 있으면
     else:
         # stock_codes들로
-        stock_codes = list(found_username_and_stocks["stock_codes"])
+        stock_codes = list(found_username["stock_codes"])
         print(stock_codes)
         # 진짜 stocks를 찾는다. 이 때 $in이라는 문법을 사용함
         stocks = list(db.stocks.find({'code': {'$in': stock_codes}}, {'_id': False}))
