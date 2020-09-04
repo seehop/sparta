@@ -175,8 +175,8 @@
             if (username != "") {
                 $.ajax({
                     method: 'POST',
-                    url: '/api/mystocks',
-                    data: {'username': username, 'code': code},
+                    url: `/api/mystocks/${username}`,
+                    data: {'code': code},
                     success: function (response) {
                         if (response["result"] == "success") {
                             window.location.reload();
