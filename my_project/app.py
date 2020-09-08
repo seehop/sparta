@@ -43,27 +43,28 @@ def search_stocks(name):
     return jsonify({'result': 'success', 'stocks': found_stocks})
 
 ## 2번째 HTML 역할을 하는 부분
-@app.route('/mystocks/<ID>')
-def mystocks(ID):
-    return render_template('mystocks.html', ID=ID)
+@app.route('/mystocks/<username>')
+def mystocks(username):
+    return render_template('mystocks.html', ID=username)
 
 #######고객이 저장하는 주식 정보 따로 모으기
 @app.route("/api/mystocks/<username>", methods=["POST"])
 def mystocks_post(username):
-    code = request.args.get('code')
+    code = request.form['code_give']
+
     found_username_and_stocks = db.saved_stocks.find_one({'username': username}, {'code': code},{'_id': False})
-    found_username = db.saved_stocks.find_ond({'username':username}, {'_id':False})
+    found_username = db.saved_stocks.find_one({'username':username}, {'_id':False})
 
     if found_username_and_stocks is None:
         if found_username is None:
-            db.saved_stocks.insert_one({'username': username, 'stock_codes': code})
+            db.saved_stocks.insert_one({'username': username, 'code': code})
             return jsonify({'result': 'success'})
         else:
-            new_stock_codes = list(found_username['stock_codes'])
-            new_stock_codes.append(code)
+            new_codes = list(found_username['code'])
+            new_codes.append(code)
             db.saved_stocks.update_one(
                 {'username': username},
-                {'$set': {'stock_codes': new_stock_codes}}
+                {'$set': {'code': new_codes}}
             )
             return jsonify({'result': 'success'})
     else:
@@ -84,10 +85,10 @@ def mystocks_get(username):
     # username에 해당하는 값이 있으면
     else:
         # stock_codes들로
-        stock_codes = list(found_username["stock_codes"])
-        print(stock_codes)
+        codes = list(found_username["code"])
+        print(codes)
         # 진짜 stocks를 찾는다. 이 때 $in이라는 문법을 사용함
-        stocks = list(db.stocks.find({'code': {'$in': stock_codes}}, {'_id': False}))
+        stocks = list(db.stocks.find({'code': {'$in': codes}}, {'_id': False}))
         # 클라이언트에게 모든 stock들을 내려주고 마무리
         return jsonify({"result": "success", "stocks": stocks})
 
