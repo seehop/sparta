@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Webpage Title -->
+    <title>의약품 가격 리뷰 | 서치팜</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+          rel="stylesheet">
+    <style>
+        .wrapper {
+            width: 100%;
+            min-width: 300px;
+            font-family: 나눔스퀘어OTF;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #title {
+            text-align: center;
+            font-size: 30px;
+            padding: 70px;
+            height: 130px;
+        }
+        .input1 {
+            padding: 0px 30px;
+            height: 130px;
+        }
+        .input2 {
+            padding: 0px 30px;
+            height: 130px;
+        }
+        #button {
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .reviews {
+            padding: 0px 30px;
+            height: 130px;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+// 엔터 누르면 입력이 되는 코드
+            var input = document.getElementById("button");
+// 엔터 누르면 입력이 되는 코드
+            input.addEventListener("keyup", function (event) {
+                // Number 13 is the "Enter" key on the keyboard
+                if (event.keyCode === 13) {
+                    // Cancel the default action, if needed
+                    event.preventDefault();
+                    // Trigger the button element with a click
+                    document.getElementById("button").click();
+                }
+            });
+            getDataAndAppendRows()
+            listReview()
+        })
+        function getDataAndAppendRows() {
+            $.ajax({
+                url: '/api/detail/{{ID}}',
+                methods: 'GET',
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        $('#title').html(response['item']['Name'])
+                    }
+                }
+            })
+        }
+        function submitReview() {
+            const pharm = $('#pharm_receive').val()
+            const price = $('#price_receive').val()
+            $.ajax({
+                method: 'POST',
+                url: '/api/detail/{{ID}}',
+                data: {'ID': '{{ID}}', 'pharm': pharm, 'price': price},
+                success: function (response) { // 성공하면
+                    if (response["result"] == "success") {
+                        window.location.reload();
+                    } else {
+                        alert("다시 한번 입력해주세요!")
+                    }
+                }
+            })
+        }
+        function listReview() {
+            $.ajax({
+                url: '/api/pharm_detail/{{ID}}',
+                methods: 'GET',
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        const detail = response['detail']
+                        for (let i = 0; i < detail.length; i++) {
+                            const details = detail[i]
+                            makeCard(details["ID"], details["pharm_name"], details["pharm_price"])
+                        }
+                    } else {
+                        alert("다시 한번 시도해주세요.");
+                    }
+                }
+            })
+        }
+        function makeCard(ID, pharm_name, pharm_price) {
+            let tempHtml = `<tr>
+                        <td>${pharm_name}</a></td>
+                        <td>${pharm_price}</td>
+                    </tr>`;
+            $("#search-pharm").append(tempHtml);
+        }
+    </script>
+</head>
+<body>
+<div class="wrapper">
+    <form>
+        <div class="form-group">
+            <h1 id="title"></h1>
+        </div>
+        <div class="input1">
+            <label for="pharm_receive">의약품 이름</label>
+            <input class="form-control" id="pharm_receive" aria-describedby="emailHelp"
+                   placeholder="예시) 로아큐탄 10mg">
+            <small id="emailHelp" class="form-text text-muted">약품명 및 함량을 정확히 입력해주세요.</small>
+        </div>
+        <div class="input2">
+            <label for="price_receive">구매 가격</label>
+            <input class="form-control" id="price_receive" placeholder="">
+        </div>
+        <div id="button">
+            <button style="button" onclick="submitReview()" type="submit" class="btn btn-outline-dark">제출하기</button>
+        </div>
+    </form>
+    <div class="reviews">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">의약품 이름</th>
+                <th scope="col">가격</th>
+            </tr>
+            </thead>
+            <tbody id="search-pharm">
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
