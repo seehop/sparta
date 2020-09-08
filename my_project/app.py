@@ -52,7 +52,7 @@ def mystocks(username):
 def mystocks_post(username):
     code = request.form['code_give']
 
-    found_username_and_stocks = db.saved_stocks.find_one({'username': username}, {'code': code},{'_id': False})
+    found_username_and_stocks = db.saved_stocks.find_one({'username': username}, {'code': code},{'_id': False}) ###########지금 여기서 문제가 생기는 듯
     found_username = db.saved_stocks.find_one({'username':username}, {'_id':False})
 
     if found_username_and_stocks is None:

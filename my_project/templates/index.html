@@ -26,7 +26,6 @@
     <style type="text/css">
         * {
             font-family: 'Sunflower', sans-serif;
-
         }
 
 
@@ -90,9 +89,9 @@
         $(document).ready(function () {
             $("#stock-box").html("");
             recommendStocks();
-// 엔터 누르면 입력이 되는 코드
+            // 엔터 누르면 입력이 되는 코드 <!-------------------------------------------왜 작동을 안하지?---------------------------------->
             var input = document.getElementById("button");
-// 엔터 누르면 입력이 되는 코드
+            // 엔터 누르면 입력이 되는 코드
             input.addEventListener("keyup", function (event) {
                 // Number 13 is the "Enter" key on the keyboard
                 if (event.keyCode === 13) {
@@ -128,8 +127,8 @@
                 type: "GET",
                 url: `/api/search/${name}`,
                 data: {},
-                success: function (response) { // 성공하면
-                    $("#search-stock-box").empty()    //이 부분 때문에 append되는 부분을 recommendation에서 findings로 바꾸면 문제가 생김
+                success: function (response) {
+                    $("#search-stock-box").empty()
                     if (response["result"] == "success") {
                         let stocks = response["stocks"];
                         console.log(stocks);
@@ -202,6 +201,7 @@
 
         }
 
+
     </script>
 
 </head>
@@ -220,7 +220,7 @@
                         <input type="text" class="form-control mb-2" id="user_name" placeholder="이름을 입력해주세요.">
                     </div>
                     <div class="col-auto">
-                        <button type="submit" class="btn btn-secondary mb-2">내 주식 보러가기</button>
+                        <button type="submit" class="btn btn-secondary mb-2">내 주식 보러가기</button>  <!--이거 누르면 다른 페이지로 이동하는 건 어떻게 하나?-->
                     </div>
                 </div>
             </form>
