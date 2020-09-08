@@ -26,18 +26,11 @@
     <style type="text/css">
         * {
             font-family: 'Sunflower', sans-serif;
-
         }
 
-
         .log-in {
+            float: right;
             padding: 20px 40px 20px 20px;
-            position: fixed;
-            left: 20px;
-            width: 100%;
-            height: 80px;
-            background-color: white;
-            z-index:1; /*Add this*/
         }
 
         .stock-title{
@@ -179,53 +172,44 @@
 
         function saveStocks(code) {
             const username = $("#user_name").val()
-            if (username == "") {
-                alert("상단에 이름을 입력해주세요!")
-                $("#user_name").focus();
-                return;
-            }
-
-            $.ajax({
-                method: 'POST',
-                url: `/api/mystocks/${username}`,
-                data: {'code_give': code},
-                success: function (response) {
+            if (username != "") {
+                $.ajax({
+                    method: 'POST',
+                    url: `/api/mystocks/${username}`,
+                    data: {'code': code},
+                    success: function (response) {
                         if (response["result"] == "success") {
-                            alert("입력하신 이름으로 주식을 저장했습니다:)")
                             window.location.reload();
                         } else {
-                            alert("이미 저장하신 주식입니다.")
-                            window.location.reload();
+                            alert("상단에 이름을 입력해주세요!")
                         }
                     }
-                });
-
+                })
+            }
         }
 
     </script>
 
 </head>
 
-
 <body>
 
-
-<header>
-
-        <div class="log-in">
-            <form>
-                <div class="form-row align-items-center">
-                    <div class="col-auto">
-                        <label class="sr-only" for="user_name">Name</label>
-                        <input type="text" class="form-control mb-2" id="user_name" placeholder="이름을 입력해주세요.">
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-secondary mb-2">내 주식 보러가기</button>
-                    </div>
-                </div>
-            </form>
+<div class="log-in">
+    <form>
+        <div class="form-row align-items-center">
+            <div class="col-auto">
+                <label class="sr-only" for="user_name">Name</label>
+                <input type="text" class="form-control mb-2" id="user_name" placeholder="이름을 입력해주세요.">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary mb-2">로그인</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary mb-2">내 주식 보러가기</button>
+            </div>
         </div>
-</header>
+    </form>
+</div>
 
 <div class="wrap">
 
